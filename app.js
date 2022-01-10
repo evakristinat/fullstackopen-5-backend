@@ -5,6 +5,7 @@ const app = express()
 const mongoose = require('mongoose')
 const blogRouter = require('./controllers/blogs')
 const userRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 const cors = require('cors')
 const logger = require('./utils/logger')
 const {
@@ -13,7 +14,7 @@ const {
   unknownEndpoint,
   tokenExtractor,
 } = require('./utils/middleware')
-const loginRouter = require('./controllers/login')
+
 
 mongoose
   .connect(config.MONGO_URI, {
@@ -31,6 +32,11 @@ app.use(tokenExtractor)
 app.use('/api/blogs', userExtractor, blogRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
+
+if(process.env.NODE_ENV === 'test'){
+  const testingRouter = require('./controllers/testing')
+  app.use('/api/testing', testingRouter)
+}
 
 app.use(unknownEndpoint)
 app.use(errorHandler)
